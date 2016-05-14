@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void userExistsForDevice(Boolean value){
-        if(value){
+        if(!value){
             Intent intent = new Intent(this,ChooseUni.class);
             startActivity(intent);
         }

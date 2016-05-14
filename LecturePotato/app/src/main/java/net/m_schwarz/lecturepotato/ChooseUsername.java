@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import net.m_schwarz.lecturepotato.Network.*;
+
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.util.UUID;
@@ -72,10 +74,14 @@ public class ChooseUsername extends AppCompatActivity {
     }
 
     void existsUser(boolean result){
+        ImageView iv = (ImageView) findViewById(R.id.usernameOk);
+
         if(result){
-            Toast.makeText(ChooseUsername.this, "Nope", Toast.LENGTH_SHORT).show();
+            iv.setImageDrawable(
+                    getResources().getDrawable(R.drawable.problem));
         }
         else {
+            iv.setImageResource(R.drawable.ok);
             EditText et = (EditText) findViewById(R.id.username);
             String username = et.getText().toString();
 

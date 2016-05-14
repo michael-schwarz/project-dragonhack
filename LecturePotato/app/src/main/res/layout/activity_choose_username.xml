@@ -17,15 +17,35 @@
         android:scaleType="fitCenter"
         />
 
-
-    <EditText
-        android:layout_width="match_parent"
+    <LinearLayout android:layout_width="fill_parent"
+        android:layout_marginTop="10dp"
         android:layout_height="wrap_content"
-        android:id="@+id/username"
-        android:layout_below="@+id/imageBox"
-        android:layout_alignParentStart="true"
-        android:singleLine="true"
-        />
+        android:weightSum="21"
+        android:orientation="horizontal"
+        android:id="@+id/selectLine"
+        android:layout_below="@id/imageBox">
+
+        <EditText
+            android:layout_weight="20"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/username"
+            android:layout_below="@+id/imageBox"
+            android:layout_alignParentStart="true"
+            android:singleLine="true"
+            />
+
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:id="@+id/usernameOk"
+            android:src="@drawable/ok"
+            android:gravity="center_vertical|right"
+            android:layout_toRightOf="@+id/username"
+            />
+
+    </LinearLayout>
 
     <Button
         android:layout_width="wrap_content"
@@ -36,11 +56,5 @@
         android:onClick="clickContinue"
         />
 
-    <ImageView
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:id="@+id/usernameOk"
-        android:foreground="@android:drawable/ic_delete"
-        android:layout_centerVertical="true"
-        android:layout_alignParentStart="true" />
+
 </RelativeLayout>
