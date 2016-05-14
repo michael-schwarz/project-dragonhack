@@ -11,7 +11,7 @@ import android.view.View;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import java.util.Calendar;
+
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;

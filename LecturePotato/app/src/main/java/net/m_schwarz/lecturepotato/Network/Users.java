@@ -7,4 +7,12 @@ public class Users {
     public static boolean existsUserForDevice(String deviceId){
         return false;
     }
+
+    public static boolean existsUser(String username){
+        return Math.random() < 0.5;
+    }
+
+    public static void createUser(String deviceId,String username,int uni){
+
+    }
 }

@@ -1,5 +1,6 @@
 package net.m_schwarz.lecturepotato;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -12,9 +13,14 @@ public class ChooseUni extends AppCompatActivity {
         setContentView(R.layout.activity_choose_uni);
     }
 
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
+
     protected void uniChosen(View v){
 
-        int uni = -1
+        int uni = -1;
         switch(v.getId()){
             case R.id.uni1_button:
                 uni = 0;
@@ -28,5 +34,9 @@ public class ChooseUni extends AppCompatActivity {
             default:
                 uni = -1;
         }
+
+        Intent intent = new Intent(this,ChooseUsername.class);
+        intent.putExtra("uni",uni);
+        startActivity(intent);
     }
 }

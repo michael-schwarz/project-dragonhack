@@ -18,7 +18,8 @@
         <activity
             android:name=".ChooseUni"
             android:label="Choose your poison!" />
-        <activity android:name=".ChooseUsername"></activity>
+        <activity android:name=".ChooseUsername"
+            android:label="Enter battle as"></activity>
     </application>
 
 </manifest>
