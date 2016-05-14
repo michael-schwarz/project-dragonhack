@@ -4,14 +4,17 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import net.m_schwarz.lecturepotato.Network.Users;
+
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import java.util.Calendar;
+
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -38,14 +41,35 @@ public class MainActivity extends AppCompatActivity {
         TimePicker tp = (TimePicker) findViewById(R.id.lectureDurationPicker);
         tp.setIs24HourView(true);
 
-        if(!Users.existsUserForDevice(getDeviceId())){
+
+        AsyncTask<String,Void,Boolean> deviceKnownTask = new AsyncTask<String, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(String... params) {
+                try {
+                    return Users.existsUserForDevice(params[0]);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Boolean value) {
+                userExistsForDevice(value);
+            }
+        };
+        deviceKnownTask.execute(getDeviceId());
+
+        Log.v("DEVICE_ID",getDeviceId());
+    }
+
+    public void userExistsForDevice(Boolean value){
+        if(value){
             Intent intent = new Intent(this,ChooseUni.class);
             startActivity(intent);
         }
-
-        Toast.makeText(MainActivity.this, getDeviceId(), Toast.LENGTH_SHORT).show();
-
     }
+
 
     public String getDeviceId(){
         SharedPreferences settings = getSharedPreferences("LecturePotato", 0);

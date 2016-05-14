@@ -13,6 +13,7 @@
         android:id="@+id/uni1_button"
         android:layout_width="match_parent"
         android:layout_height="150dp"
+        android:scaleType="fitCenter"
         android:src="@drawable/uni_ljubljana"
         android:onClick="uniChosen"
         />
@@ -22,6 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:src="@drawable/tum"
+        android:scaleType="fitCenter"
         android:layout_below="@id/uni1_button"
         android:onClick="uniChosen"
         />

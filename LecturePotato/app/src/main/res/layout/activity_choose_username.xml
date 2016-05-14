@@ -9,4 +9,38 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="net.m_schwarz.lecturepotato.ChooseUsername">
 
+    <ImageButton
+        android:id="@+id/imageBox"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:src="@drawable/uni_ljubljana"
+        android:scaleType="fitCenter"
+        />
+
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/username"
+        android:layout_below="@+id/imageBox"
+        android:layout_alignParentStart="true"
+        android:singleLine="true"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:text="Continue"
+        android:onClick="clickContinue"
+        />
+
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:id="@+id/usernameOk"
+        android:foreground="@android:drawable/ic_delete"
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true" />
 </RelativeLayout>
