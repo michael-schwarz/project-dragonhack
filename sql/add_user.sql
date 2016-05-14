@@ -6,4 +6,4 @@ CREATE OR REPLACE FUNCTION dh.add_user(nickname char[20], device_id uuid, univer
 	INSERT INTO dh.universities (university_id, name, country)
 	VALUES (university_id, name, country)
 $$
-LANGUAGE sql
+LANGUAGE sql;

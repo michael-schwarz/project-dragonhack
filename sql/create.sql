@@ -1,5 +1,5 @@
 CREATE DATABASE potato
- OWNER =  Nick
+ OWNER =  "Nick"
  ENCODING = 'UTF8'
  CONNECTION LIMIT = -1
  
