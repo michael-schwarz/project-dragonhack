@@ -39,11 +39,9 @@ public class MainActivity extends AppCompatActivity {
         tp.setIs24HourView(true);
 
         if(!Users.existsUserForDevice(getDeviceId())){
-
-
-
+            Intent intent = new Intent(this,ChooseUni.class);
+            startActivity(intent);
         }
-
 
         Toast.makeText(MainActivity.this, getDeviceId(), Toast.LENGTH_SHORT).show();
 

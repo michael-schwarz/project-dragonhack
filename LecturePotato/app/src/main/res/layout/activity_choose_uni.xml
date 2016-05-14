@@ -13,15 +13,17 @@
         android:id="@+id/uni1_button"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:src="@drawable/TUM"
+        android:src="@drawable/uni_ljubljana"
+        android:onClick="uniChosen"
         />
 
     <ImageButton
         android:id="@+id/uni2_button"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:src="@drawable/uni_ljubljana"
+        android:src="@drawable/tum"
         android:layout_below="@id/uni1_button"
+        android:onClick="uniChosen"
         />
 
     <ImageButton
@@ -30,5 +32,7 @@
         android:layout_height="150dp"
         android:src="@drawable/ukoper"
         android:scaleType="fitCenter"
-        android:layout_below="@+id/uni2_button" />
+        android:layout_below="@+id/uni2_button"
+        android:onClick="uniChosen"
+        />
 </RelativeLayout>

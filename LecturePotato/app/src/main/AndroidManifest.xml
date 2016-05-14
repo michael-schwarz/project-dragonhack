@@ -15,7 +15,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ChooseUni"></activity>
+        <activity
+            android:name=".ChooseUni"
+            android:label="Choose your poison!" />
+        <activity android:name=".ChooseUsername"></activity>
     </application>
 
 </manifest>
