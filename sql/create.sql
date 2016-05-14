@@ -1,10 +1,3 @@
-CREATE DATABASE potato
- OWNER =  "Nick"
- ENCODING = 'UTF8'
- CONNECTION LIMIT = -1;
- 
-\c potato;
-
 CREATE TABLE university
 (
 	university_id integer PRIMARY KEY NOT NULL,
@@ -25,4 +18,12 @@ CREATE TABLE users
 	month_slack integer,
 	total_all integer,
 	total_slack integer
+);
+
+CREATE TABLE heartbeats
+(
+		id serial PRIMARY KEY NOT NULL, 
+		user_id integer NOT NULL REFERENCES users(user_id),
+		time_all integer NOT NULL,
+		time_slack integer NOT NULL
 );
