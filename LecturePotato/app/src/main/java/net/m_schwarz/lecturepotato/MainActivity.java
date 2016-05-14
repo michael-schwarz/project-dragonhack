@@ -1,11 +1,9 @@
 package net.m_schwarz.lecturepotato;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import net.m_schwarz.lecturepotato.Network.Users;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,6 +15,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
     ScreenReceiver mReceiver;
@@ -38,6 +37,30 @@ public class MainActivity extends AppCompatActivity {
 
         TimePicker tp = (TimePicker) findViewById(R.id.lectureDurationPicker);
         tp.setIs24HourView(true);
+
+        if(!Users.existsUserForDevice(getDeviceId())){
+
+
+
+        }
+
+
+        Toast.makeText(MainActivity.this, getDeviceId(), Toast.LENGTH_SHORT).show();
+
+    }
+
+    public String getDeviceId(){
+        SharedPreferences settings = getSharedPreferences("LecturePotato", 0);
+        if(!settings.getBoolean("started",false)){
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putBoolean("started",true);
+
+            UUID id = UUID.randomUUID();
+            editor.putString("deviceId",id.toString());
+            editor.commit();
+        }
+
+        return settings.getString("deviceId","");
     }
 
     public void startButtonClicked(View v){
