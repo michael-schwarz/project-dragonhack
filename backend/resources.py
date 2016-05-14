@@ -40,9 +40,8 @@ class LeaderboardUniversityResource(Resource):
 
 
 class DeviceIDResource(Resource):
-    ids = ['111']
-
     def get(self, device_id):
+        conn.execute("SELECT ")
         if device_id in DeviceIDResource.ids:
             return {'user_id': 1}
         else:
@@ -50,11 +49,26 @@ class DeviceIDResource(Resource):
 
 
 class UserNameResource(Resource):
+    put_parser = reqparse.RequestParser()
+    put_parser.add_argument('device_id', type=str, help="Device ID string", required=True)
+    put_parser.add_argument('university_id', type=int, help="University ID", required=True)
+
     def get(self, name):
-        pass
+        cursor.execute("SELECT * FROM users WHERE nickname=%s", (name,))
+        if cursor.rowcount == 0:
+            return dict(), 404
+        return cursor.fetchone()
 
     def put(self, name):
-        pass
+        args = UserNameResource.put_parser.parse_args()
+        device_id = args['device_id']
+        university_id = args['university_id']
+        cursor.execute("SELECT 1 FROM users WHERE nickname=%s", (name,))
+        if cursor.fetchone() is not None:
+            abort(412, message="Nickname {} already exists".format(name))
+        cursor.execute("INSERT INTO users (nickname, device_id, university_id) VALUES (%s, %s, %s)",
+                       (name, device_id, university_id))
+        cursor.commit()
 
 
 class UserIDResource(Resource):
