@@ -9,7 +9,7 @@ import java.net.URL;
 public class Users {
     static String baseUrl = "http://localhost:8080/stuff";
 
-    public static boolean existsUserForDevice(String deviceId) { // throws Exception{
+    public static boolean existsUserForDevice(String deviceId) throws Exception{
         // URL url = new URL(baseUrl + "/device/"+ deviceId);
         // HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         // conn.setRequestMethod("GET");
@@ -24,9 +24,7 @@ public class Users {
        // conn.setRequestMethod("GET");
        // conn.connect();
        // return (conn.getResponseCode() == 200);
-
         return Math.random() < 0.5;
-
     }
 
     public static void createUser(String deviceId,String username,int uni){
