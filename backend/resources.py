@@ -98,6 +98,9 @@ class UserNameResource(Resource):
         cursor.execute("SELECT 1 FROM users WHERE nickname=%s", (name,))
         if cursor.fetchone() is not None:
             abort(412, message="Nickname {} already exists".format(name))
+        cursor.execute("SELECT 1 FROM users WHERE device_id=%s", (device_id,))
+        if cursor.fetchone() is not None:
+            abort(412, message="Device UUID {} already exists".format(name))
         cursor.execute("INSERT INTO users (nickname, device_id, university_id) VALUES (%s, %s, %s)",
                        (name, device_id, university_id))
         db_conn.commit()
