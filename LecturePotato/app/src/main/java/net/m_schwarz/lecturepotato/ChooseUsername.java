@@ -11,7 +11,6 @@ import android.widget.ImageButton;
 import net.m_schwarz.lecturepotato.Network.*;
 
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import java.util.UUID;
 
@@ -48,7 +47,7 @@ public class ChooseUsername extends AppCompatActivity {
         }
     }
 
-    void clickContinue(View v){
+    protected void clickContinue(View v){
         EditText et = (EditText) findViewById(R.id.username);
         String username = et.getText().toString();
 
@@ -85,11 +84,42 @@ public class ChooseUsername extends AppCompatActivity {
             EditText et = (EditText) findViewById(R.id.username);
             String username = et.getText().toString();
 
-            Users.createUser(getDeviceId(),username,uni);
-            Intent intent = new Intent(this,MainActivity.class);
-            startActivity(intent);
-            finish();
+            AsyncTask<UserInfo,Void,Void> createUserTask = new AsyncTask<UserInfo, Void, Void>() {
+                @Override
+                protected Void doInBackground(UserInfo... params) {
+                    try {
+                        Users.createUser(params[0].deviceId,params[0].username,params[0].uni);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(Void param){
+                    createUserFinished();
+                }
+            };
+
+            createUserTask.execute(new UserInfo(username,getDeviceId(),uni));
         }
+    }
+
+    class UserInfo {
+        String username,deviceId;
+        int uni;
+
+        public UserInfo(String username,String deviceId,int uni){
+            this.username = username;
+            this.deviceId = deviceId;
+            this.uni = uni;
+        }
+    }
+
+    void createUserFinished(){
+        Intent intent = new Intent(this,MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     public String getDeviceId(){
