@@ -17,6 +17,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class LeaderboardActivity extends AppCompatActivity {
@@ -102,17 +104,21 @@ public class LeaderboardActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_leaderboard, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
 
-            if(getArguments().getInt(ARG_SECTION_NUMBER) == 0){
-                textView.setText("Daily");
-            }
-            else if (getArguments().getInt(ARG_SECTION_NUMBER) == 1){
-                textView.setText("Monthly");
-            }
-            else{
-                textView.setText("All-time");
-            }
+            ListView lv = (ListView) rootView.findViewById(R.id.listview);
+
+
+            LeaderPosition[] values = new LeaderPosition[] {
+                    new LeaderPosition("Michael","12000"),
+                    new LeaderPosition("Bojan","10000"),
+                    new LeaderPosition("Sasha","08000"),
+                    new LeaderPosition("Anna","00500"),
+                    new LeaderPosition("Sarah","00010"),
+                    new LeaderPosition("Georg","00005"),
+            };
+
+            ArrayAdapter<LeaderPosition> adapter = new LeaderboardAdapter(getActivity(), values);
+            lv.setAdapter(adapter);
 
             return rootView;
         }
