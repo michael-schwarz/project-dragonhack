@@ -53,16 +53,6 @@ public class LeaderboardActivity extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
     }
 
 
@@ -79,11 +69,6 @@ public class LeaderboardActivity extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -118,7 +103,17 @@ public class LeaderboardActivity extends AppCompatActivity {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_leaderboard, container, false);
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+
+            if(getArguments().getInt(ARG_SECTION_NUMBER) == 0){
+                textView.setText("Daily");
+            }
+            else if (getArguments().getInt(ARG_SECTION_NUMBER) == 1){
+                textView.setText("Monthly");
+            }
+            else{
+                textView.setText("All-time");
+            }
+
             return rootView;
         }
     }
@@ -150,11 +145,11 @@ public class LeaderboardActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "SECTION 1";
+                    return "DAILY";
                 case 1:
-                    return "SECTION 2";
+                    return "MONTHLY";
                 case 2:
-                    return "SECTION 3";
+                    return "ALL-TIME";
             }
             return null;
         }

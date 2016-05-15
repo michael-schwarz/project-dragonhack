@@ -42,6 +42,11 @@ public class MainActivity extends AppCompatActivity {
         tp.setIs24HourView(true);
 
 
+        Intent intent = new Intent(this,LeaderboardActivity.class);
+        startActivity(intent);
+
+        /**
+
         AsyncTask<String,Void,Boolean> deviceKnownTask = new AsyncTask<String, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(String... params) {
@@ -60,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         };
         deviceKnownTask.execute(getDeviceId());
 
-        Log.v("DEVICE_ID",getDeviceId());
+        Log.v("DEVICE_ID",getDeviceId()); **/
     }
 
     public void userExistsForDevice(Boolean value){

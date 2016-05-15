@@ -26,7 +26,7 @@
             android:label="Enter battle as" />
         <activity
             android:name=".LeaderboardActivity"
-            android:label="@string/title_activity_leaderboard"
+            android:label="Am I awesome yet?"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
