@@ -48,7 +48,7 @@ class LeaderboardUserResource(Resource):
         if range not in {'day', 'month', 'total'}:
             abort(400, message="Range must be one of {day, month, total}")
         cursor.execute(
-            "SELECT Us.nickname, (1.0*Us.{}_slack/Us.{}_all) AS stat "
+            "SELECT Us.nickname, cast(1.0*Us.{}_slack/Us.{}_all AS FLOAT) AS stat "
             "FROM users Us "
             "INNER JOIN university Un ON Us.university_id=Un.university_id "
             "WHERE Us.{}_all>0 "
@@ -58,11 +58,11 @@ class LeaderboardUserResource(Resource):
 
 
 class LeaderboardUniversityResource(Resource):
-    def get(self, university_id, range='all'):
+    def get(self, university_id, range='total'):
         if range not in {'day', 'month', 'total'}:
             abort(400, message="Range must be one of {day, month, total}")
         cursor.execute(
-            "SELECT Us.nickname, (1.0*Us.{}_slack/Us.{}_all) AS stat "
+            "SELECT Us.nickname, cast(1.0*Us.{}_slack/Us.{}_all AS FLOAT) AS stat "
             "FROM users Us "
             "WHERE Us.{}_all>0 AND Us.university_id = %s "
             "ORDER BY stat"
