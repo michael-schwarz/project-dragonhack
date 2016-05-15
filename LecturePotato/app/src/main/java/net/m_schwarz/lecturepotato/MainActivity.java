@@ -51,8 +51,6 @@ public class MainActivity extends AppCompatActivity {
 
         setTitle("When does the lecture end?");
 
-        notifySlackness(0.56996);
-
         TimePicker tp = (TimePicker) findViewById(R.id.lectureDurationPicker);
         tp.setIs24HourView(true);
 
@@ -140,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         toggleVis(true);
-                        mReceiver.over(uDetails.user_id);
+                        notifySlackness(mReceiver.over(uDetails.user_id));
                     }
                 });
             }

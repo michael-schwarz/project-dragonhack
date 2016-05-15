@@ -54,7 +54,7 @@ public class ScreenReceiver extends BroadcastReceiver{
         }
     }
 
-    public void over(int userid){
+    public double over(int userid){
         Log.v("TIME","Is up");
         if(on) { active += (System.currentTimeMillis() - lastOn); }
 
@@ -76,8 +76,11 @@ public class ScreenReceiver extends BroadcastReceiver{
         };
 
 
+
         task.execute(new ThreeInts(userid,(int)(total/1000),(int)(active/1000)));
         Log.v("RESULT","Active " + active + " / " + total);
+
+        return active/(total*1);
     }
 
 
