@@ -49,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
         mReceiver = new ScreenReceiver();
         registerReceiver(mReceiver, filter);
 
+        setTitle("When does the lecture end?");
+
         notifySlackness(0.56996);
 
         TimePicker tp = (TimePicker) findViewById(R.id.lectureDurationPicker);
