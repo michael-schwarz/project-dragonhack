@@ -1,6 +1,8 @@
 from flask_restful import Resource, abort, reqparse
+from psycopg2.extras import RealDictCursor
 
 user_ids = set([1])
+db_conn = None
 cursor = None
 
 
@@ -12,46 +14,76 @@ class HeartbeatResource(Resource):
 
     def put(self, user_id):
         args = HeartbeatResource.put_parser.parse_args()
-        if user_id not in user_ids:
-            abort(412, message="Bad user id")
-        if cursor is not None:
-            cursor.execute("INSERT INTO heartbeats (user_id, lecture_time, slack_time) VALUES (%s, %s, %s)",
-                           (user_id, args['lecture_time'], args['slack_time']))
+        time_all = args['lecture_time']
+        time_slack = args['slack_time']
+        cursor.execute("INSERT INTO heartbeats (time_all, time_slack, user_id) VALUES (%s, %s, %s)",
+                       (time_all, time_slack, user_id))
+        cursor.execute("UPDATE users "
+                       "SET "
+                       "day_all = day_all + %s, "
+                       "month_all = month_all + %s, "
+                       "total_all = total_all + %s", (time_all, time_all, time_all))
+        cursor.execute("UPDATE users "
+                       "SET "
+                       "day_slack = day_slack + %s, "
+                       "month_slack = month_slack + %s, "
+                       "total_slack = total_slack + %s", (time_slack, time_slack, time_slack))
+        db_conn.commit()
 
     def get(self, user_id=None):
-        if user_id not in user_ids:
-            abort(412, message="Bad user id")
-        cursor.execute("SELECT * FROM heartbeats")
-        return [r for r in cursor.fetchall()]
+        if user_id is None:
+            cursor.execute("SELECT * FROM heartbeats LIMIT 100")
+            return {'data': cursor.fetchall()}
+        else:
+            cursor.execute("SELECT * FROM heartbeats WHERE user_id = %s LIMIT 100", (user_id,))
+            res = cursor.fetchone()
+            if res is not None:
+                return res
+            else:
+                return dict()
 
 
 class LeaderboardUserResource(Resource):
-    def get(self, university_id, range='all'):
-        if range != 'all':
-            return {'error': '{} is not a valid range'.format(range)}
-        return {'id': university_id, 'range': range}
+    def get(self, user_id, range='total'):
+        if range not in {'day', 'month', 'total'}:
+            abort(400, message="Range must be one of {day, month, total}")
+        cursor.execute(
+            "SELECT Us.nickname, (1.0*Us.{}_slack/Us.{}_all) AS stat "
+            "FROM users Us "
+            "INNER JOIN university Un ON Us.university_id=Un.university_id "
+            "WHERE Us.{}_all>0 "
+            "ORDER BY stat"
+            .format(range, range, range))
+        return {'data': cursor.fetchall()}
 
 
 class LeaderboardUniversityResource(Resource):
     def get(self, university_id, range='all'):
-        if range != 'all':
-            return {'error': '{} is not a valid range'.format(range)}
-        return {'id': university_id, 'range': range}
+        if range not in {'day', 'month', 'total'}:
+            abort(400, message="Range must be one of {day, month, total}")
+        cursor.execute(
+            "SELECT Us.nickname, (1.0*Us.{}_slack/Us.{}_all) AS stat "
+            "FROM users Us "
+            "WHERE Us.{}_all>0 AND Us.university_id = %s "
+            "ORDER BY stat"
+                .format(range, range, range), (university_id, ))
+        return {'data': cursor.fetchall()}
 
 
 class DeviceIDResource(Resource):
     def get(self, device_id):
-        conn.execute("SELECT ")
-        if device_id in DeviceIDResource.ids:
-            return {'user_id': 1}
-        else:
+        cursor.execute("SELECT * FROM users WHERE device_id=%s", (device_id,))
+        res = cursor.fetchone()
+        if res is None:
             abort(404, "Requested device ID not found")
+        else:
+            return res
 
 
 class UserNameResource(Resource):
     put_parser = reqparse.RequestParser()
-    put_parser.add_argument('device_id', type=str, help="Device ID string", required=True)
-    put_parser.add_argument('university_id', type=int, help="University ID", required=True)
+    put_parser.add_argument('device_id', type=str, help="Device UUID", required=True, location='json')
+    put_parser.add_argument('university_id', type=int, help="University ID", required=True, location='json')
 
     def get(self, name):
         cursor.execute("SELECT * FROM users WHERE nickname=%s", (name,))
@@ -68,9 +100,14 @@ class UserNameResource(Resource):
             abort(412, message="Nickname {} already exists".format(name))
         cursor.execute("INSERT INTO users (nickname, device_id, university_id) VALUES (%s, %s, %s)",
                        (name, device_id, university_id))
-        cursor.commit()
+        db_conn.commit()
 
 
 class UserIDResource(Resource):
     def get(self, user_id):
-        pass
+        cursor.execute("SELECT * FROM users WHERE user_id=%s", (user_id,))
+        res = cursor.fetchone()
+        if res is None:
+            abort(404, message="User ID {} not found".format(user_id))
+        else:
+            return res

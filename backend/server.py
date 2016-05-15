@@ -9,7 +9,8 @@ from resources import *
 
 app = Flask(__name__)
 api = Api(app)
-db_conn = psycopg2.connect("dbname=potato user=backend password=verysecure")
+db_conn = psycopg2.connect("host=localhost dbname=potato user=backend password=verysecure")
+resources.db_conn = db_conn
 resources.cursor = db_conn.cursor(cursor_factory=RealDictCursor)
 
 api.add_resource(HeartbeatResource, '/heartbeat/<int:user_id>')
