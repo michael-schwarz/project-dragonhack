@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     Timer timer;
     final Handler handler = new Handler();
 
-    static boolean FORCE = true;
+    static boolean FORCE = false;
     Users.UserDetails uDetails;
 
     @Override
@@ -135,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
 
         if(end.getTime()-System.currentTimeMillis() < 1){
             Toast.makeText(MainActivity.this, "Lectures can not be in the past", Toast.LENGTH_SHORT).show();
+            return;
         }
 
         timer = new Timer();
