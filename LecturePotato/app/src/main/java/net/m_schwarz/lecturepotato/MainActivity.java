@@ -1,14 +1,22 @@
 package net.m_schwarz.lecturepotato;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import net.m_schwarz.lecturepotato.Network.Users;
 
+import android.graphics.Color;
+import android.graphics.drawable.Icon;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.TimePicker;
@@ -40,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(Intent.ACTION_SCREEN_ON);
         mReceiver = new ScreenReceiver();
         registerReceiver(mReceiver, filter);
+
+        notifySlackness(0.56996);
 
         TimePicker tp = (TimePicker) findViewById(R.id.lectureDurationPicker);
         tp.setIs24HourView(true);
@@ -127,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
+                        toggleVis(true);
                         mReceiver.over(uDetails.user_id);
                     }
                 });
@@ -140,6 +151,9 @@ public class MainActivity extends AppCompatActivity {
 
         timer = new Timer();
         timer.schedule(timerTask,end.getTime()-System.currentTimeMillis());
+
+
+        toggleVis(false);
     }
 
     protected void openLeaderboard(View v){
@@ -147,4 +161,24 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    protected void toggleVis(boolean value){
+        findViewById(R.id.startButton).setAlpha(value?1.0f:.1f);
+        findViewById(R.id.startButton).setClickable(value);
+        findViewById(R.id.lectureDurationPicker).setAlpha(value?1.0f:.1f);
+        findViewById(R.id.lectureDurationPicker).setEnabled(value);
+    }
+
+    protected void notifySlackness(double percent) {
+        Notification notification  = new Notification.Builder(this).setCategory(Notification.CATEGORY_MESSAGE)
+                .setContentTitle("LecturePotato")
+                .setContentText("During this lecture, you spent " +
+                        (int) Math.ceil(percent* 100) + "% slacking.")
+                .setAutoCancel(true)
+                .setSmallIcon(R.drawable.logo1)
+                .setVisibility(Notification.VISIBILITY_PUBLIC).build();
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.notify(457, notification );
+
+    }
 }
