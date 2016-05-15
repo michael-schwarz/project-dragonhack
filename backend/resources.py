@@ -75,7 +75,7 @@ class DeviceIDResource(Resource):
         cursor.execute("SELECT * FROM users WHERE device_id=%s", (device_id,))
         res = cursor.fetchone()
         if res is None:
-            abort(404, "Requested device ID not found")
+            abort(404, message="Requested device ID not found")
         else:
             return res
 
