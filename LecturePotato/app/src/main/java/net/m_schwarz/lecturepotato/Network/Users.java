@@ -1,6 +1,10 @@
 package net.m_schwarz.lecturepotato.Network;
 
+import com.google.gson.Gson;
+
+import java.io.BufferedReader;
 import java.io.DataInputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -9,7 +13,7 @@ import java.net.URL;
  * Created by michael on 14.05.16.
  */
 public class Users {
-    static String baseUrl = "http://193.2.179.219:5000";
+    static String baseUrl = "http://dragon.mbscware.com:5000";
 
     public static boolean existsUserForDevice(String deviceId) throws Exception{
         URL url = new URL(baseUrl + "/device/"+ deviceId);
@@ -17,7 +21,6 @@ public class Users {
         conn.setRequestMethod("GET");
         conn.connect();
 
-        getUserDetails(deviceId);
         return (conn.getResponseCode() == 200);
     }
 
@@ -26,15 +29,26 @@ public class Users {
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
 
-        String message = new DataInputStream(conn.getInputStream()).readUTF();
 
-        return null;
+        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = br.readLine()) != null) {
+            sb.append(line+"\n");
+        }
+        br.close();
+        String message = sb.toString();
+
+        Gson gson = new Gson();
+        UserDetails ud = gson.fromJson(message, UserDetails.class);
+
+        return ud;
     }
 
     public class UserDetails{
-        int user_id;
-        String username;
-        int university_id;
+        public int user_id;
+        public String username;
+        public int university_id;
     }
 
 

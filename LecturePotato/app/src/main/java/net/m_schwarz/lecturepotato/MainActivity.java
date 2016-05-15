@@ -26,6 +26,9 @@ public class MainActivity extends AppCompatActivity {
     Timer timer;
     final Handler handler = new Handler();
 
+    static boolean FORCE = true;
+    Users.UserDetails uDetails;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,12 +43,6 @@ public class MainActivity extends AppCompatActivity {
 
         TimePicker tp = (TimePicker) findViewById(R.id.lectureDurationPicker);
         tp.setIs24HourView(true);
-
-
-        Intent intent = new Intent(this,LeaderboardActivity.class);
-        startActivity(intent);
-
-        /**
 
         AsyncTask<String,Void,Boolean> deviceKnownTask = new AsyncTask<String, Void, Boolean>() {
             @Override
@@ -65,26 +62,53 @@ public class MainActivity extends AppCompatActivity {
         };
         deviceKnownTask.execute(getDeviceId());
 
-        Log.v("DEVICE_ID",getDeviceId()); **/
+        Log.v("DEVICE_ID",getDeviceId());
     }
 
     public void userExistsForDevice(Boolean value){
         if(!value){
             Intent intent = new Intent(this,ChooseUni.class);
             startActivity(intent);
+            return;
         }
+
+
+        AsyncTask<String,Void,Users.UserDetails> getUserDetailsTask = new AsyncTask<String, Void, Users.UserDetails>() {
+            @Override
+            protected Users.UserDetails doInBackground(String... params) {
+                try {
+                    return Users.getUserDetails(params[0]);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Users.UserDetails details){
+                gotUserDetails(details);
+            }
+        };
+
+        getUserDetailsTask.execute(getDeviceId());
     }
 
 
+    public void gotUserDetails(Users.UserDetails details) {
+        this.uDetails = details;
+    }
+
     public String getDeviceId(){
         SharedPreferences settings = getSharedPreferences("LecturePotato", 0);
-        if(!settings.getBoolean("started",false)){
+        if(!settings.getBoolean("started",false) || FORCE){
             SharedPreferences.Editor editor = settings.edit();
             editor.putBoolean("started",true);
 
             UUID id = UUID.randomUUID();
             editor.putString("deviceId",id.toString());
             editor.commit();
+
+            FORCE = false;
         }
 
         return settings.getString("deviceId","");
@@ -103,15 +127,23 @@ public class MainActivity extends AppCompatActivity {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mReceiver.over();
+                        mReceiver.over(uDetails.user_id);
                     }
                 });
             }
         };
 
+        if(end.getTime()-System.currentTimeMillis() < 1){
+            Toast.makeText(MainActivity.this, "Lectures can not be in the past", Toast.LENGTH_SHORT).show();
+        }
+
         timer = new Timer();
         timer.schedule(timerTask,end.getTime()-System.currentTimeMillis());
     }
 
+    protected void openLeaderboard(View v){
+        Intent intent = new Intent(this,LeaderboardActivity.class);
+        startActivity(intent);
+    }
 
 }

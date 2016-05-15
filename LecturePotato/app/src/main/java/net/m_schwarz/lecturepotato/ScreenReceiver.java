@@ -3,9 +3,12 @@ package net.m_schwarz.lecturepotato;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.text.format.Time;
 import android.util.Log;
 import android.widget.Toast;
+
+import net.m_schwarz.lecturepotato.Network.Heartbeat;
 
 /**
  * Created by michael on 14.05.16.
@@ -51,10 +54,42 @@ public class ScreenReceiver extends BroadcastReceiver{
         }
     }
 
-    public void over(){
+    public void over(int userid){
         Log.v("TIME","Is up");
         if(on) { active += (System.currentTimeMillis() - lastOn); }
+
+        AsyncTask<ThreeInts,Void,Void> task = new AsyncTask<ThreeInts, Void, Void>() {
+            @Override
+            protected Void doInBackground(ThreeInts... params) {
+                try {
+                    Heartbeat.push(params[0].first,params[0].second,params[0].third);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void arg){
+
+            }
+        };
+
+
+        task.execute(new ThreeInts(userid,(int)(total/1000),(int)(active/1000)));
         Log.v("RESULT","Active " + active + " / " + total);
+    }
+
+
+
+    public class ThreeInts {
+        int first,second,third;
+
+        public ThreeInts(int first,int second,int third){
+            this.first = first;
+            this.second = second;
+            this.third = third;
+        }
     }
 
     private boolean inTime(){

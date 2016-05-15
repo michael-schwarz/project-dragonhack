@@ -35,13 +35,13 @@ public class ChooseUsername extends AppCompatActivity {
         ImageButton ib = (ImageButton) findViewById(R.id.imageBox);
 
         switch(uni){
-            case 0:
+            case 1:
                 ib.setImageResource(R.drawable.uni_ljubljana);
                 break;
-            case 1:
+            case 2:
                 ib.setImageResource(R.drawable.tum);
                 break;
-            case 2:
+            case 3:
                 ib.setImageResource(R.drawable.ukoper);
                 break;
         }

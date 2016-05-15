@@ -23,13 +23,13 @@ public class ChooseUni extends AppCompatActivity {
         int uni = -1;
         switch(v.getId()){
             case R.id.uni1_button:
-                uni = 0;
-                break;
-            case R.id.uni2_button:
                 uni = 1;
                 break;
-            case R.id.uni3_button:
+            case R.id.uni2_button:
                 uni = 2;
+                break;
+            case R.id.uni3_button:
+                uni = 3;
                 break;
             default:
                 uni = -1;
