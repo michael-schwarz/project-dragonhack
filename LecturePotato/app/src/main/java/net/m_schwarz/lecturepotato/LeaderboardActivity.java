@@ -1,5 +1,6 @@
 package net.m_schwarz.lecturepotato;
 
+import android.os.AsyncTask;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -21,6 +22,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import net.m_schwarz.lecturepotato.Network.Leaderboard;
+
+import javax.security.auth.login.LoginException;
+
 public class LeaderboardActivity extends AppCompatActivity {
 
     /**
@@ -38,10 +43,17 @@ public class LeaderboardActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
 
+    public int userId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaderboard);
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            userId = extras.getInt("userId");
+        }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -78,12 +90,13 @@ public class LeaderboardActivity extends AppCompatActivity {
     /**
      * A placeholder fragment containing a simple view.
      */
-    public static class PlaceholderFragment extends Fragment {
+    public class PlaceholderFragment extends Fragment {
         /**
          * The fragment argument representing the section number for this
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
+        public View rootView;
 
         public PlaceholderFragment() {
         }
@@ -92,7 +105,7 @@ public class LeaderboardActivity extends AppCompatActivity {
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
+        public PlaceholderFragment newInstance(int sectionNumber) {
             PlaceholderFragment fragment = new PlaceholderFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
@@ -103,26 +116,64 @@ public class LeaderboardActivity extends AppCompatActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_leaderboard, container, false);
+            rootView = inflater.inflate(R.layout.fragment_leaderboard, container, false);
 
-            ListView lv = (ListView) rootView.findViewById(R.id.listview);
+            int details = this.getArguments().getInt(ARG_SECTION_NUMBER);
+            String range ="";
+
+            switch(details) {
+                case 0:
+                    range = "day";
+                    break;
+                case 1:
+                    range = "month";
+                    break;
+                case 2:
+                    range = "total";
+                    break;
+                default:
+                    boolean stuff = false;
+                    range = "poison"+ details;
+                    break;
+            }
 
 
-            LeaderPosition[] values = new LeaderPosition[] {
-                    new LeaderPosition("Michael","12000"),
-                    new LeaderPosition("Bojan","10000"),
-                    new LeaderPosition("Sasha","08000"),
-                    new LeaderPosition("Anna","00500"),
-                    new LeaderPosition("Sarah","00010"),
-                    new LeaderPosition("Georg","00005"),
+            AsyncTask<String,Void,Leaderboard.LeaderboardEntries> getDataForLeader = new AsyncTask<String, Void, Leaderboard.LeaderboardEntries>() {
+                @Override
+                protected Leaderboard.LeaderboardEntries doInBackground(String... params) {
+                    try {
+                        return Leaderboard.getEntries(params[0],params[1]);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+                @Override
+                protected void onPostExecute(Leaderboard.LeaderboardEntries entries) {
+                    receivedBoard(entries);
+                }
             };
 
-            ArrayAdapter<LeaderPosition> adapter = new LeaderboardAdapter(getActivity(), values);
-            lv.setAdapter(adapter);
+            getDataForLeader.execute(userId+"",range);
 
             return rootView;
         }
+
+        public void receivedBoard(Leaderboard.LeaderboardEntries entries){
+            LeaderPosition[] values = new LeaderPosition[entries.data.length];
+
+            for(int i=0;i < entries.data.length;i++){
+                values[i] = new LeaderPosition(entries.data[i].nickname,""+(1000-Math.floor(entries.data[i].stat*1000)));
+            }
+
+            ListView lv = (ListView) rootView.findViewById(R.id.listview);
+            ArrayAdapter<LeaderPosition> adapter = new LeaderboardAdapter(getContext(), values);
+
+            lv.setAdapter(adapter);
+        }
     }
+
+
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -138,7 +189,8 @@ public class LeaderboardActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            // Be really careful
+            return (new PlaceholderFragment()).newInstance(position);
         }
 
         @Override

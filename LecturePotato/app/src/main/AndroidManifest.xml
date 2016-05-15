@@ -12,6 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity"
+            android:screenOrientation="portrait"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,12 +21,15 @@
             </intent-filter>
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".ChooseUni"
             android:label="Choose your poison!" />
         <activity
+            android:screenOrientation="portrait"
             android:name=".ChooseUsername"
             android:label="Enter battle as" />
         <activity
+            android:screenOrientation="portrait"
             android:name=".LeaderboardActivity"
             android:label="Am I awesome yet?"
             android:theme="@style/AppTheme.NoActionBar"></activity>

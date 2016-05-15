@@ -158,6 +158,7 @@ public class MainActivity extends AppCompatActivity {
 
     protected void openLeaderboard(View v){
         Intent intent = new Intent(this,LeaderboardActivity.class);
+        intent.putExtra("userId", uDetails.user_id);
         startActivity(intent);
     }
 

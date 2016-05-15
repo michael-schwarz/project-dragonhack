@@ -80,7 +80,7 @@ public class ScreenReceiver extends BroadcastReceiver{
         task.execute(new ThreeInts(userid,(int)(total/1000),(int)(active/1000)));
         Log.v("RESULT","Active " + active + " / " + total);
 
-        return active/(total*1);
+        return active/(total*1.0);
     }
 
 
