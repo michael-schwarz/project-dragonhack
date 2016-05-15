@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     Timer timer;
     final Handler handler = new Handler();
 
-    static boolean FORCE = false;
+    static boolean FORCE = true;
     Users.UserDetails uDetails;
 
     @Override

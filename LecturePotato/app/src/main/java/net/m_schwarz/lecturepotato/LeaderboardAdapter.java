@@ -8,6 +8,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
+import java.security.MessageDigest;
+
 /**
  * Created by michael on 15.05.16.
  */
@@ -31,9 +35,11 @@ public class LeaderboardAdapter extends ArrayAdapter<LeaderPosition> {
             TextView name = (TextView) rowView.findViewById(R.id.firstLine);
             TextView textView = (TextView) rowView.findViewById(R.id.secondLine);
             ImageView imageView = (ImageView) rowView.findViewById(R.id.icon);
+
+
             textView.setText(values[position].points);
             name.setText(values[position].username);
 
             return rowView;
         }
-    }
+ }
