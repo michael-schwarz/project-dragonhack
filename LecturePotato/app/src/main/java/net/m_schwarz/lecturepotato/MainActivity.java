@@ -173,13 +173,12 @@ public class MainActivity extends AppCompatActivity {
         Notification notification  = new Notification.Builder(this).setCategory(Notification.CATEGORY_MESSAGE)
                 .setContentTitle("LecturePotato")
                 .setContentText("During this lecture, you spent " +
-                        (int) Math.ceil(percent* 100) + "% slacking.")
+                        Math.min(100,(int) Math.ceil(percent* 100)) + "% slacking.")
                 .setAutoCancel(true)
                 .setSmallIcon(R.drawable.logo1)
                 .setVisibility(Notification.VISIBILITY_PUBLIC).build();
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notificationManager.notify(457, notification );
-
     }
 }
