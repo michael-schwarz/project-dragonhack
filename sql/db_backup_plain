@@ -1,0 +1,530 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 9.5.2
+-- Dumped by pg_dump version 9.5.2
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
+
+DROP DATABASE potato;
+--
+-- Name: potato; Type: DATABASE; Schema: -; Owner: dancsi
+--
+
+CREATE DATABASE potato WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'en_US.UTF-8' LC_CTYPE = 'en_US.UTF-8';
+
+
+ALTER DATABASE potato OWNER TO dancsi;
+
+\connect potato
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: dh; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA dh;
+
+
+ALTER SCHEMA dh OWNER TO postgres;
+
+--
+-- Name: public; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA public;
+
+
+ALTER SCHEMA public OWNER TO postgres;
+
+--
+-- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: postgres
+--
+
+COMMENT ON SCHEMA public IS 'standard public schema';
+
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+SET search_path = dh, pg_catalog;
+
+--
+-- Name: reset_month(); Type: FUNCTION; Schema: dh; Owner: postgres
+--
+
+CREATE FUNCTION reset_month() RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+	UPDATE dh.users SET dh.users.month_all=0, dh.users.month_slack=0;
+END
+$$;
+
+
+ALTER FUNCTION dh.reset_month() OWNER TO postgres;
+
+SET search_path = public, pg_catalog;
+
+--
+-- Name: add_user(character, uuid, integer); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION add_user(nickname character, device_id uuid, university_id integer) RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+	INSERT INTO users ( nickname, device_id, university_id)
+	VALUES (nickname, device_id, university_id);
+END
+$$;
+
+
+ALTER FUNCTION public.add_user(nickname character, device_id uuid, university_id integer) OWNER TO postgres;
+
+--
+-- Name: check_nickname(character); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION check_nickname(nickname1 character) RETURNS boolean
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+	RETURN (SELECT EXISTS (SELECT 1 FROM users WHERE nickname=nickname1));
+END
+$$;
+
+
+ALTER FUNCTION public.check_nickname(nickname1 character) OWNER TO postgres;
+
+--
+-- Name: get_nickname(character varying); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION get_nickname(nick character varying) RETURNS TABLE(nickname1 character, device_id1 uuid, university_id1 integer)
+    LANGUAGE plpgsql
+    AS $$ 
+BEGIN
+RETURN QUERY (SELECT (nickname , device_id, university_id ) FROM users WHERE nickname=nick);
+END $$;
+
+
+ALTER FUNCTION public.get_nickname(nick character varying) OWNER TO postgres;
+
+--
+-- Name: reset_day(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION reset_day() RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+	UPDATE users SET day_all=0, day_slack=0;
+END
+$$;
+
+
+ALTER FUNCTION public.reset_day() OWNER TO postgres;
+
+--
+-- Name: reset_month(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION reset_month() RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+	UPDATE users SET month_all=0, month_slack=0;
+END
+$$;
+
+
+ALTER FUNCTION public.reset_month() OWNER TO postgres;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: heartbeats; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE heartbeats (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    time_all integer NOT NULL,
+    time_slack integer NOT NULL
+);
+
+
+ALTER TABLE heartbeats OWNER TO postgres;
+
+--
+-- Name: heartbeats_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE heartbeats_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE heartbeats_id_seq OWNER TO postgres;
+
+--
+-- Name: heartbeats_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE heartbeats_id_seq OWNED BY heartbeats.id;
+
+
+--
+-- Name: university; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE university (
+    university_id integer NOT NULL,
+    name character varying(100) NOT NULL,
+    country character varying(100) NOT NULL
+);
+
+
+ALTER TABLE university OWNER TO postgres;
+
+--
+-- Name: university_university_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE university_university_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE university_university_id_seq OWNER TO postgres;
+
+--
+-- Name: university_university_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE university_university_id_seq OWNED BY university.university_id;
+
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE users (
+    user_id integer NOT NULL,
+    nickname character varying(50) NOT NULL,
+    device_id uuid NOT NULL,
+    university_id integer NOT NULL,
+    day_all integer DEFAULT 0,
+    day_slack integer DEFAULT 0,
+    month_all integer DEFAULT 0,
+    month_slack integer DEFAULT 0,
+    total_all integer DEFAULT 0,
+    total_slack integer DEFAULT 0
+);
+
+
+ALTER TABLE users OWNER TO postgres;
+
+--
+-- Name: users_user_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE users_user_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE users_user_id_seq OWNER TO postgres;
+
+--
+-- Name: users_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE users_user_id_seq OWNED BY users.user_id;
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY heartbeats ALTER COLUMN id SET DEFAULT nextval('heartbeats_id_seq'::regclass);
+
+
+--
+-- Name: university_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY university ALTER COLUMN university_id SET DEFAULT nextval('university_university_id_seq'::regclass);
+
+
+--
+-- Name: user_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY users ALTER COLUMN user_id SET DEFAULT nextval('users_user_id_seq'::regclass);
+
+
+--
+-- Data for Name: heartbeats; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY heartbeats (id, user_id, time_all, time_slack) FROM stdin;
+1	1	0	0
+2	2	18	9
+3	3	3	1
+4	4	2	1
+5	5	10	4
+6	6	6	1
+7	7	20	14
+8	8	10	8
+9	9	25	16
+10	10	41	20
+11	11	10	3
+12	12	19	7
+13	13	12	5
+14	14	15	10
+15	15	21	7
+16	16	18	3
+17	17	26	9
+18	18	15	5
+19	19	12	4
+20	20	32	22
+21	20	0	0
+\.
+
+
+--
+-- Name: heartbeats_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('heartbeats_id_seq', 21, true);
+
+
+--
+-- Data for Name: university; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY university (university_id, name, country) FROM stdin;
+1	University of Ljubljana	Slovenia
+2	University of Munich	Germany
+\.
+
+
+--
+-- Name: university_university_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('university_university_id_seq', 2, true);
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY users (user_id, nickname, device_id, university_id, day_all, day_slack, month_all, month_slack, total_all, total_slack) FROM stdin;
+1	name2	e15366d4-ef92-4d15-847b-102fdf8ccf9d	1	39	22	49	31	50	31
+2	name3	cd8dc8bf-49d4-4e53-878d-743098e6a462	1	32	22	33	22	35	23
+3	name4	3e3fa020-9c25-43c6-a530-82c50fdf0496	1	34	23	36	22	34	23
+4	name5	a641d6e8-2397-4cd0-b4e9-a130c5dfafd7	1	34	22	36	22	42	26
+5	name6	d96e724f-a233-424a-be86-2944038af5f7	1	37	23	36	23	38	23
+6	name7	d2253fd0-9ef6-4fe1-974e-45e39c05a01f	1	36	23	42	28	52	36
+7	name8	cafc9d75-b82c-4617-bb41-c1c3f4cc4910	1	40	23	46	30	42	30
+8	name9	8eb19d79-1bfa-4c95-ba83-09de2e20f078	1	42	28	48	25	57	38
+9	name10	94faa14e-13fc-4156-bf13-e57afd40708d	1	42	29	62	42	73	42
+10	name11	b4317e37-b531-446f-a661-512f406c5dc1	2	34	22	35	23	42	25
+11	name12	e0636454-f3b4-4af4-a7e0-d4e09e802d42	2	35	23	37	24	51	29
+12	name13	71be7d01-6d07-45a0-bc43-fb23ec7214be	2	35	23	34	22	44	27
+13	name14	1afeef6a-b5cb-42b8-8690-1875090cb74b	2	38	26	42	27	47	32
+14	name15	b4e3a4b0-55c7-4e34-ae6a-af593103477c	2	42	27	47	28	53	29
+15	name16	00cec7d4-ed82-4c09-a22e-4147f5328b93	2	37	25	41	30	50	25
+16	name17	bc89737d-403f-437e-be49-110bf7c4fed5	2	43	23	44	29	58	31
+17	name18	fdbf20fc-7c86-4123-a8a7-dee6da77e6ce	2	42	23	43	24	47	27
+18	name19	0940fb93-8a43-4ed3-afe3-798ea69600ec	2	35	23	36	24	44	26
+19	name20	e336cb40-941e-42e0-bd62-7a8d4f49fb06	2	44	28	46	29	52	32
+20	horst	d0d61d11-9f7c-493b-8e8b-2a4a2613117d	1	32	22	32	22	32	22
+\.
+
+
+--
+-- Name: users_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('users_user_id_seq', 20, true);
+
+
+--
+-- Name: heartbeats_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY heartbeats
+    ADD CONSTRAINT heartbeats_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: university_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY university
+    ADD CONSTRAINT university_pkey PRIMARY KEY (university_id);
+
+
+--
+-- Name: users_device_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_device_id_key UNIQUE (device_id);
+
+
+--
+-- Name: users_nickname_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_nickname_key UNIQUE (nickname);
+
+
+--
+-- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (user_id);
+
+
+--
+-- Name: heartbeats_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY heartbeats
+    ADD CONSTRAINT heartbeats_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(user_id);
+
+
+--
+-- Name: users_university_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_university_id_fkey FOREIGN KEY (university_id) REFERENCES university(university_id);
+
+
+--
+-- Name: dh; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA dh FROM PUBLIC;
+REVOKE ALL ON SCHEMA dh FROM postgres;
+GRANT ALL ON SCHEMA dh TO postgres;
+
+
+--
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- Name: heartbeats; Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON TABLE heartbeats FROM PUBLIC;
+REVOKE ALL ON TABLE heartbeats FROM postgres;
+GRANT ALL ON TABLE heartbeats TO postgres;
+GRANT ALL ON TABLE heartbeats TO backend;
+
+
+--
+-- Name: heartbeats_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON SEQUENCE heartbeats_id_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE heartbeats_id_seq FROM postgres;
+GRANT ALL ON SEQUENCE heartbeats_id_seq TO postgres;
+GRANT ALL ON SEQUENCE heartbeats_id_seq TO backend;
+
+
+--
+-- Name: university; Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON TABLE university FROM PUBLIC;
+REVOKE ALL ON TABLE university FROM postgres;
+GRANT ALL ON TABLE university TO postgres;
+GRANT ALL ON TABLE university TO backend;
+
+
+--
+-- Name: university_university_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON SEQUENCE university_university_id_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE university_university_id_seq FROM postgres;
+GRANT ALL ON SEQUENCE university_university_id_seq TO postgres;
+GRANT ALL ON SEQUENCE university_university_id_seq TO backend;
+
+
+--
+-- Name: users; Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON TABLE users FROM PUBLIC;
+REVOKE ALL ON TABLE users FROM postgres;
+GRANT ALL ON TABLE users TO postgres;
+GRANT ALL ON TABLE users TO backend;
+
+
+--
+-- Name: users_user_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON SEQUENCE users_user_id_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE users_user_id_seq FROM postgres;
+GRANT ALL ON SEQUENCE users_user_id_seq TO postgres;
+GRANT ALL ON SEQUENCE users_user_id_seq TO backend;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
